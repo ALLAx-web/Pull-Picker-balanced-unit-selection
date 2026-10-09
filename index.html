@@ -65,12 +65,13 @@ function show(){
  let h='<div class="c"><b>'+o.length+' units</b> · '+new Set(o.map(m=>m.c)).size+' containers · '+o.reduce((a,m)=>a+m.bd,0)+' dead boards · '+(reps?reps+' repeated container(s)':'no repeated containers')+
  '<div class="chips">'+Object.keys(z).sort().map(k=>'<span class="chip">'+k+': '+z[k]+'</span>').join("")+'</div>'+
  '<div class="r" style="margin-top:10px"><button onclick="cp()">Copy list</button><button onclick="dl()">Download CSV</button><button onclick="pick()">Re-pick</button></div></div>'+
- '<div class="c ov"><table><tr><th>#</th><th>Cluster</th><th>Container</th><th>Miner IP</th><th>Serial</th><th>Boards</th></tr>'+
- s.map((m,i)=>'<tr><td>'+(i+1)+'</td><td>'+m.cl+'</td><td>C'+m.c+'</td><td>'+m.ip+'</td><td>'+m.sn+'</td><td>'+(m.bl||'-')+'</td></tr>').join("")+'</table></div>';
+ '<div class="c ov"><table><tr><th>Container</th><th>Cluster</th><th>Miner IP</th><th>Serial</th><th>Boards</th></tr>'+
+ s.map(m=>'<tr><td>C'+m.c+'</td><td>'+m.cl+'</td><td>'+m.ip+'</td><td>'+m.sn+'</td><td>'+hb(m.bl)+'</td></tr>').join("")+'</table></div>';
  out.innerHTML=h}
-const rows=()=>last.slice().sort((a,b)=>a.c-b.c).map(m=>[m.cl,"C"+m.c,m.ip,m.sn,'"'+m.bl+'"']);
+function hb(b){return String(b||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>'HB'+x).join(', ')||'-'}
+const rows=()=>last.slice().sort((a,b)=>a.c-b.c).map(m=>['C'+m.c,m.cl,m.ip,m.sn,'"'+hb(m.bl)+'"']);
 function cp(){const t=rows().map(r=>r.join("\t")).join("\n");try{navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}}
-function dl(){const t="Cluster,Container,Miner IP,Serial,Boards\n"+rows().map(r=>r.join(",")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(t);a.download="pull_list.csv";a.click()}
+function dl(){const t="Container,Cluster,Miner IP,Serial,Boards\n"+rows().map(r=>r.join(",")).join("\n");const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(t);a.download="pull_list.csv";a.click()}
 function pc(l){const o=[];let c="",q=false;for(const ch of l){if(ch=='"')q=!q;else if(ch==","&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o}
 f.onchange=e=>{const r=new FileReader();r.onload=()=>{const L=r.result.split(/\r?\n/).filter(x=>x.trim());
  const H=pc(L[0]).map(x=>x.trim().toLowerCase());const ix=H.indexOf("miner ip"),sx=H.indexOf("serial number"),bx=H.indexOf("affected boards");
