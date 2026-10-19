@@ -55,13 +55,11 @@ function pick(){
  const rnd=st.value=="random";
  const byCl={};Object.keys(byC).forEach(c=>{const k=byC[c][0].cl;(byCl[k]??=[]).push(+c)});
  const out=[];const used={};
- // each round: one unit per container (no repeats); clusters round-robin so zones stay balanced
  while(out.length<N){
   const q={};let any=false;
   for(const k in byCl){q[k]=sh(byCl[k]).filter(c=>(used[c]||0)<byC[c].length);if(q[k].length)any=true}
   if(!any)break;
   const keys=sh(Object.keys(q));
-  // stay in round: containers used this round
   while(out.length<N){let prog=false;
    for(const k of keys){if(out.length>=N)break;const c=q[k].shift();if(c==null)continue;prog=true;
     const left=byC[c].filter(m=>!out.includes(m));
@@ -79,7 +77,7 @@ function show(){
  '<div class="r" style="margin-top:10px"><button onclick="cp()">Copy list</button><button onclick="dl()">Download CSV</button><button onclick="pick()">Re-pick</button></div></div>'+
  '<div class="c ov"><table><tr><th>Container</th><th>Cluster</th><th>Miner IP</th><th>MAC</th><th>Serial</th><th>Boards</th></tr>'+
  s.map(m=>'<tr><td>C'+m.c+'</td><td>'+m.cl+'</td><td>'+m.ip+'</td><td>'+m.mac+'</td><td>'+m.sn+'</td><td>'+hb(m.bl)+'</td></tr>').join("")+'</table></div>';
- out.innerHTML=h}
+ document.getElementById("out").innerHTML=h}
 function hb(b){return String(b||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>'HB'+x).join(', ')||'-'}
 const rows=()=>last.slice().sort((a,b)=>a.c-b.c).map(m=>['C'+m.c,m.cl,m.ip,m.mac,m.sn,'"'+hb(m.bl)+'"']);
 function cp(){const t=rows().map(r=>r.join("\t")).join("\n");try{navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}}
